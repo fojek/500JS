@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		body {font-family: Arial, Helvetica, sans-serif;}
+		form {border: 3px solid #f1f1f1;}
+
+		input[type=text] {
+		  width: 100%;
+		  padding: 12px 20px;
+		  margin: 8px 0;
+		  display: inline-block;
+		  border: 1px solid #ccc;
+		  box-sizing: border-box;
+		}
+
+		button {
+		  background-color: #4CAF50;
+		  color: white;
+		  padding: 14px 20px;
+		  margin: 8px 0;
+		  border: none;
+		  cursor: pointer;
+		  width: 100%;
+		}
+
+		button:hover {
+		  opacity: 0.8;
+		}
+
+		.cancelbtn {
+		  width: auto;
+		  padding: 10px 18px;
+		  background-color: #f44336;
+		}
+
+		.imgcontainer {
+		  text-align: center;
+		  margin: 24px 0 12px 0;
+		}
+
+		img.avatar {
+		  width: 40%;
+		  border-radius: 50%;
+		}
+
+		.container {
+		  padding: 16px;
+		}
+
+		span.psw {
+		  float: right;
+		  padding-top: 16px;
+		}
+
+		/* Change styles for span and cancel button on extra small screens */
+		@media screen and (max-width: 300px) {
+		  span.psw {
+			 display: block;
+			 float: none;
+		  }
+		  .cancelbtn {
+			 width: 100%;
+		  }
+		}
+		</style>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="cards.css" rel="stylesheet" type="text/css">
+	    <style type="text/css">
+        pre { font-size: 80%; }
+    </style>
+</head>
+<body>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="cards.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+	  $(function () {
+		var socket = io();
+		$('form').submit(function(e){
+		  e.preventDefault(); // prevents page reloading
+		  socket.emit('chat message', $('#nom').val());
+		  $('#nom').val('');
+		  return false;
+		});
+		socket.on('chat message', function(msg){
+		  $('#messages').append($('<li>').text(msg));
+		});
+	  });
+	</script>
+<h2>Connexion</h2>
+
+<form action="" >
+  <div class="imgcontainer">
+	 <div class="hand fan">
+	   <img class='card' src='cards/AS.svg'>
+	   <img class='card' src='cards/KS.svg'>
+	   <img class='card' src='cards/QS.svg'>
+	   <img class='card' src='cards/JS.svg'>
+	   <img class='card' src='cards/10S.svg'>
+	   <img class='card' src='cards/9H.svg'>
+	   <img class='card' src='cards/3H.svg'>
+	   <img class='card' src='cards/10D.svg'>
+	   <img class='card' src='cards/4D.svg'>
+	   <img class='card' src='cards/2D.svg'>
+	   <img class='card' src='cards/8C.svg'>
+	   <img class='card' src='cards/7C.svg'>
+	   <img class='card' src='cards/6C.svg'>
+	 </div>
+  </div>
+
+  <div class="container">
+    <label for="nom"><b>Nom</b></label>
+    <input type="text" placeholder="Le nom reçu par courriel" id = "nom" name="nom" required>
+
+    <label for="passphrase"><b>Phrase de passe</b></label>
+    <input type="text" placeholder="la phrase de passe reçue par courriel" name="passphrase" required>
+        
+    <button type="submit">Connexion</button>
+  </div>
+
+  <div class="container" style="background-color:#f1f1f1">
+	Marc Fortier Games (C) 2020
+  </div>
+</form>
+
+</body>
+</html>
