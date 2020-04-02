@@ -3,17 +3,31 @@ var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
+// Classes Joueur et Joueurs
+require('./Joueur.js')();
+
+var joueurs = new Joueurs();
+
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/login.html');
 });
+
+app.get('/index.html', function(req, res){
+  res.sendFile(__dirname + '/index.html');
+});
+
 
 app.use(express.static('cardsJS'));
 
 io.on('connection', function(socket){
 	console.log(socket.id);
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
-	console.log(msg);
+  socket.on('connexion', function(msg){
+	// Effectue la connexion et renvoie le joeur (ou null si la connexion a échoué)
+	io.emit('joueur', joueurs.connexionJoueur(socket.id, msg.nom, msg.pp));
+  });
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+	joueurs.deconnexionJoueur(socket.id);
   });
 });
 

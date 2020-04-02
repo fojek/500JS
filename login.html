@@ -72,7 +72,6 @@
     </style>
 </head>
 <body>
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="cards.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
@@ -81,16 +80,21 @@
 		var socket = io();
 		$('form').submit(function(e){
 		  e.preventDefault(); // prevents page reloading
-		  socket.emit('chat message', $('#nom').val());
-		  $('#nom').val('');
+			
+		  socket.emit('connexion', { 
+				nom: $('#nom').val(), 
+				pp: $('#passphrase').val()
+			  });
+		  //$('#nom').val('');
 		  return false;
 		});
-		socket.on('chat message', function(msg){
-		  $('#messages').append($('<li>').text(msg));
+		socket.on('joueur', function(joueur){
+		  $('#messages').append($('<li>').text(joueur.nom));
+		  //window.location.href = "/index.html";
 		});
 	  });
 	</script>
-<h2>Connexion</h2>
+<h2>Connexion au jeu de 500 en ligne!</h2>
 
 <form action="" >
   <div class="imgcontainer">
@@ -100,31 +104,33 @@
 	   <img class='card' src='cards/QS.svg'>
 	   <img class='card' src='cards/JS.svg'>
 	   <img class='card' src='cards/10S.svg'>
-	   <img class='card' src='cards/9H.svg'>
+	   <img class='card' src='cards/9S.svg'>
 	   <img class='card' src='cards/3H.svg'>
 	   <img class='card' src='cards/10D.svg'>
 	   <img class='card' src='cards/4D.svg'>
 	   <img class='card' src='cards/2D.svg'>
 	   <img class='card' src='cards/8C.svg'>
 	   <img class='card' src='cards/7C.svg'>
-	   <img class='card' src='cards/6C.svg'>
+	   <img class='card' src='cards/Joker.svg'>
 	 </div>
   </div>
 
   <div class="container">
     <label for="nom"><b>Nom</b></label>
-    <input type="text" placeholder="Le nom reçu par courriel" id = "nom" name="nom" required>
+    <input type="text" placeholder="Le nom recu par courriel" id = "nom" name="nom" required>
 
     <label for="passphrase"><b>Phrase de passe</b></label>
-    <input type="text" placeholder="la phrase de passe reçue par courriel" name="passphrase" required>
+    <input type="text" placeholder="la phrase de passe recue par courriel" name="passphrase" id = "passphrase" required>
         
     <button type="submit">Connexion</button>
   </div>
 
   <div class="container" style="background-color:#f1f1f1">
-	Marc Fortier Games (C) 2020
+	Marc Fortier Games (c) - 2020
   </div>
 </form>
+
+<ul id="messages"></ul>
 
 </body>
 </html>
