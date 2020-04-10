@@ -3,8 +3,8 @@ var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
-// Classes Joueur et Joueurs
-require('./Joueur.js')();
+// Classes du Jeu
+require('./Jeu.js')();
 
 var joueurs = new Joueurs();
 
