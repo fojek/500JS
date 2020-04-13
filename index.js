@@ -9,7 +9,7 @@ require('./Jeu.js')();
 var joueurs = new Joueurs();
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/login.html');
+  res.sendFile(__dirname + '/index.html');
 });
 
 app.get('/index.html', function(req, res){
