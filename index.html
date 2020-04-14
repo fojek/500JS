@@ -6,7 +6,7 @@
 <meta charset="utf-8"/>
 <style>
 .page {
-  outline: 1px dashed green;
+  /*outline: 1px dashed green;*/
   flex-direction: column; /* | row-reverse | column*/
   display: flex; /* or inline-flex */
   align-items: stretch;
@@ -17,15 +17,15 @@
   left: 0;
 }
 .ligne {
-  outline: 1px dashed blue;
+  /*outline: 1px dashed blue;*/
   border:1px solid transparent;
   display: flex; /* or inline-flex */
   align-items: stretch;
   flex-direction: row;
-  justify-content: center;
+  justify-content: start;
 }
 .colonne {
-  outline: 1px dashed red;
+  /*outline: 1px dashed red;*/
   border:1px solid transparent;
   display: flex; /* or inline-flex */
   flex-grow: 1;
@@ -34,7 +34,7 @@
   flex-direction: column;
 }
 .centre {
-  outline: 1px dashed red;
+  /*outline: 1px dashed red;*/
   border:1px solid transparent;
   display: flex; /* or inline-flex */
   flex-grow: 3;
@@ -42,7 +42,7 @@
   flex-direction: column;
 }
 .centreTable {
-  outline: 1px dashed red;
+  /*outline: 1px dashed red;*/
   border:1px solid transparent;
   display: flex; /* or inline-flex */
   flex-grow: 3;
@@ -70,7 +70,21 @@
 	width: 200px;
 	align-items: baseline;
 }
-
+.modalDiv {
+  justify-content: center;
+  flex-direction: row;
+  display: flex; /* or inline-flex */
+}
+.modalDivChild {
+	flex-grow: 2;
+}
+.modalDivChild2 {
+	flex-grow: 1;
+	justify-content: center;
+	flex-direction: row;
+	display: flex; /* or inline-flex */
+	align-items: center;
+}
 
 /*****************************/
 body {
@@ -78,13 +92,9 @@ body {
 }
 
 form {
-  border: 3px solid #f1f1f1;
+  /*border: 3px solid #f1f1f1;*/
   width: auto;
-  display: block;
-}
-
-input {
-  width: 100%;
+  /*display: block;*/
 }
 
 button {
@@ -92,9 +102,21 @@ button {
   color: white;
   padding: 14px 20px;
   margin: 8px 8px;
-  border: none;
+  /*border: none;*/
   cursor: pointer;
   width: 100%;
+}
+
+.fondVert {
+  background-color: #4CAF50;
+  color: white;
+  align-items: start;
+  justify-content: start;
+}
+
+.fondGris {
+  background-color: gray;
+  color: white;
 }
 
 button:hover {
@@ -142,23 +164,23 @@ button:hover {
 </script>
 <section class="page">
 	<div class="ligne">
-        <div class="colonne" id="divTitre">
-			<h1>Jeu de 500 en ligne!</h2>
-        </div>        
-		<div class="colonne larg200" id="divConnexion">
-			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalConnexion">
+        <div class="colonne fondVert" id="divTitre">
+			<h3>Jeu de 500 en ligne!</h3>
+        </div>       
+		<div class="colonne larg200 fondVert" id="divConnexion">
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalPrendre">
 			  Connexion
 			</button>
         </div>
 	</div>
     <div class="ligne hautOuBas">
-        <div class="colonne">videG
+        <div class="colonne">
         </div>
         <div class="centre">
             <div class="nomJoueur">NomJoueurH</div>
         	<div class="mainJoueur"><div class='hand vhand-compact' data-hand='flow: horizontal; spacing: 0.2; width: 90; cards: BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK'></div></div>
         </div>
-        <div class="colonne">videD
+        <div class="colonne">
         </div>
 	</div>
     <div class="ligne milieu">
@@ -181,7 +203,7 @@ button:hover {
         </div>
 	</div>
     <div class="ligne hautOuBas">
-        <div class="colonne">videG
+        <div class="colonne">
         </div>
         <div class="centre">
             <div class="nomJoueur">NomJoueurB</div>
@@ -203,7 +225,7 @@ button:hover {
 				</div>
 			</div>
         </div>
-        <div class="colonne">videD
+        <div class="colonne">
         </div>
 	</div>
 </section>
@@ -213,25 +235,67 @@ button:hover {
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Connexion</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <h5>Connexion</h5>
       </div>
       <div class="modal-body">
-		<form action="" >
-		  <div class="container_100" id='test'>
-			<label for="nom"><b>Nom</b></label>
-			<input type="text" placeholder="Le nom recu par courriel" id = "nom" name="nom" required>
-
-			<label for="passphrase"><b>Phrase de passe</b></label>
-			<input type="text" placeholder="la phrase de passe recue par courriel" name="passphrase" id = "passphrase" required>
-				
-			<button type="submit">Connexion</button>
+		<form>
+		  <div class="modalDiv">
+		    <div class="modalDivChild">
+			  <label for="nom"><b>Nom</b></label>
+			  <input type="text" placeholder="nom recu par courriel" id = "nom" name="nom" required><br>
+			  <label for="passphrase"><b>Pdp</b></label>
+			  <input type="text" placeholder="phrase de passe" name="passphrase" id = "passphrase" required><br>
+			  <button type="submit">Connexion</button>
+			</div>		  
 		  </div>
 
 		  <div class="container_bas" style="background-color:#f1f1f1">
 			Marc Fortier Games (c) - 2020
+		  </div>
+		</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Prendre -->
+<div class="modal fade" id="modalPrendre" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Veuillez choisir un atout</h3>
+      </div>
+      <div class="modal-body">
+		<form>
+		  <div class="modalDiv">
+		    <div class="modalDivChild">
+			  <input type="radio" id="sept" name="levees" value="7">
+			  <label for="sept">Sept</label><br>
+			  <input type="radio" id="huit" name="levees" value="8">
+			  <label for="huit">Huit</label><br>
+			  <input type="radio" id="neuf" name="levees" value="9">
+			  <label for="neuf">Neuf</label><br>		  
+			  <input type="radio" id="dix" name="levees" value="10">
+			  <label for="dix">La partie</label>
+			</div>
+			<div class="modalDivChild">
+			  <input type="radio" id="trefle" name="enseigne" value="trefle">
+			  <label for="trefle">Trefle</label><br>
+			  <input type="radio" id="carreau" name="enseigne" value="carreau">
+			  <label for="carreau">Carreau</label><br>  
+			  <input type="radio" id="coeur" name="enseigne" value="coeur">
+			  <label for="coeur">Coeur</label><br>
+			  <input type="radio" id="pique" name="enseigne" value="pique">
+			  <label for="pique">Pique</label><br>			  
+			  <input type="radio" id="sans" name="enseigne" value="sans">
+			  <label for="sans">Sans atout</label><br><br>
+			</div>
+			<div class="modalDivChild2">
+			<div class="modalDivChild">
+			  <button type="submit">Prendre</button>
+			  <button class="fondGris" type="submit">Passer</button>
+			  </div>
+			</div>
 		  </div>
 		</form>
       </div>
