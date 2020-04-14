@@ -4,9 +4,11 @@ module.exports = function() {
 	
 	/***************************/
 	/*** Joueur ***************/
-	Joueur = function(nom) {
-		this.nom = nom;
+	Joueur = function(pNom, pJoueurs) {
+		this.nom = pNom;
 		this.id = null;
+		this.joueurs = pJoueurs;
+		this.main = null;
 	};
 
 	// Associe le id au joueur
@@ -30,15 +32,32 @@ module.exports = function() {
 	Joueur.prototype.toString = function() {
 		return this.nom + ' : ' + this.id;
 	}
+	
+	Joueur.prototype.genUI = function() {
+		return { 
+			nom: this.nom, 
+			cartes: this.main.cartes
+		};
+	}
+	
+	// obj pour les autres joueurs
+	Joueur.prototype.genDosUI = function() {
+		var obj = this.genUI();
+		
+		obj.nbCartes = obj.cartes.length;
+		obj.cartes = null;
+		
+		return obj;
+	}
 
 	/***************************/
 	/*** Joueurs ***************/
 	Joueurs = function() {
 		this.liste = [
-			new Joueur('Micheline'), 
-			new Joueur('Simon'), 
-			new Joueur('Marie-Helene'), 
-			new Joueur('Marc')];
+			new Joueur('Micheline', this), 
+			new Joueur('Simon', this), 
+			new Joueur('Marie-Helene', this), 
+			new Joueur('Marc', this)];
 	};
 
 	Joueurs.prototype.getJoueurNom = function(nom) {
@@ -254,7 +273,28 @@ module.exports = function() {
 		this.donneur = pDonneur;
 	};
 	
-	Manche.prototype.uneFonction = function() {
+	Manche.prototype.genObjUI = function(joueur) {
+	
+		// l'objet de retour
+		var obj = {};
+		
+		// Trouver ordre des autres joueurs
+		joueurG = joueur.suivant();
+		joueurH = joueur.suivant().suivant();
+		joueurD = joueur.suivant().suivant().suivant();
+		
+		// Joueurs cachés
+		obj.joueurG = joueurG.genUI_Cache();
+		obj.joueurH = joueurH.genUI_Cache();
+		obj.joueurD = joueurD.genUI_Cache();
+		
+		// Joueur actif
+		obj.joueurB = joueur.genUI();
+		
+		// Manche
+		obj.Manche = this.genUI();
+		
+		return obj;
 	};
 	
 	/**************************/
