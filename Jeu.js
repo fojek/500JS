@@ -49,6 +49,10 @@ module.exports = function() {
 		
 		return obj;
 	}
+	
+	Joueur.prototype.suivant = function() {
+		return this.joueurs.joueurSuivant(this);
+	}
 
 	/***************************/
 	/*** Joueurs ***************/
@@ -58,6 +62,24 @@ module.exports = function() {
 			new Joueur('Simon', this), 
 			new Joueur('Marie-Helene', this), 
 			new Joueur('Marc', this)];
+	};
+	
+	Joueurs.prototype.joueurSuivant = function(joueur) {
+		var index = this.getJoueurIndex(joueur) + 1;
+		
+		if(index>this.liste.length)
+			index = 0;
+		
+		return this.liste[index];
+	}
+	
+	Joueurs.prototype.getJoueurIndex = function(joueur) {
+		for(let i=0; i < this.liste.length; ++i) {
+			if(this.liste[i].nom == joueur.nom)
+				return i;
+		}
+		// Le joueur n'existe pas ou n'est pas connecte.
+		return null;
 	};
 
 	Joueurs.prototype.getJoueurNom = function(nom) {
@@ -271,6 +293,19 @@ module.exports = function() {
 		this.levees = [];
 		this.mains = [];
 		this.donneur = pDonneur;
+		this.joueurActif = pDonneur;
+	};
+	
+	Manche.prototype.leveesEquipe = function(noEquipe) {
+		return noEquipe;
+	};
+	
+	Manche.prototype.genUI = function(joueur) {
+		return {
+			atout: this.atout,
+			leveesEquipeA: this.leveesEquipe(0),
+			leveesEquipeA: this.leveesEquipe(1)
+		};
 	};
 	
 	Manche.prototype.genObjUI = function(joueur) {
@@ -284,9 +319,9 @@ module.exports = function() {
 		joueurD = joueur.suivant().suivant().suivant();
 		
 		// Joueurs cachés
-		obj.joueurG = joueurG.genUI_Cache();
-		obj.joueurH = joueurH.genUI_Cache();
-		obj.joueurD = joueurD.genUI_Cache();
+		obj.joueurG = joueurG.genDosUI();
+		obj.joueurH = joueurH.genDosUI();
+		obj.joueurD = joueurD.genDosUI();
 		
 		// Joueur actif
 		obj.joueurB = joueur.genUI();
@@ -302,31 +337,28 @@ module.exports = function() {
 	Partie = function(joueurs) {
 		this.equipes = [];
 		this.manches = [];
-		this.ordreDeJeu = joueurs.liste;
-		this.donneur = 0;
+		this.joueurs = joueurs;
+		this.donneur = this.joueurs.liste[0];
 	};
 	
-	Partie.prototype.CommencerManche = function(donneur) {
+	Partie.prototype.CommencerManche = function() {
 		var p = new Paquet();
 		var mains = p.Donner();
 		
-		for(let i=0; i<this.ordreDeJeu.length; ++i){
-			this.ordreDeJeu[i].main = mains.pop();
+		for(let i=0; i<this.joueurs.liste.length; ++i){
+			this.joueurs.liste[i].main = mains.pop();
 		}
 		
-		this.manches.push(new Manche(donneur));
+		this.manches.push(new Manche(this.donneur));
 	};
 		
 	// Avance au donneur suivant avant de le retourner
 	Partie.prototype.Donneur = function() {
-		if(this.donneur >= this.ordreDeJeu.length)
-			this.donneur = 0;
-		
-		return this.ordreDeJeu[this.donneur];
+		return this.donneur.suivant();
 	}
 	
 	Partie.prototype.Jouer = function() {
-		this.CommencerManche();
+		this.CommencerManche(0);
 	}
 	
 	/**************************/
