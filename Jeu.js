@@ -18,7 +18,7 @@ module.exports = function() {
 			console.log('Joueur \'' + this.nom + '\' deja utilise.');
 			return null;
 		} else {
-			joueur.id = id;
+			this.id = id;
 			console.log('(Entree) ' + this.toString());
 			return this;
 		}
@@ -67,7 +67,7 @@ module.exports = function() {
 	Joueurs.prototype.joueurSuivant = function(joueur) {
 		var index = this.getJoueurIndex(joueur) + 1;
 		
-		if(index>this.liste.length)
+		if(index>=this.liste.length)
 			index = 0;
 		
 		return this.liste[index];
@@ -92,6 +92,7 @@ module.exports = function() {
 	};
 	
 	Joueurs.prototype.getJoueurId = function(id) {
+		console.log("dans getJoueurId");
 		for(let i=0; i < this.liste.length; ++i) {
 			if(this.liste[i].id == id) {
 				return this.liste[i];
@@ -105,7 +106,7 @@ module.exports = function() {
 		// console.log(id + " demande une connexion a \"" + nom + "\" avec la phrase de passe \"" + pp + "\".");
 		if(pp === PASSPHRASE) {	
 		
-			joueur = this.getJoueurId(id);
+			var joueur = this.getJoueurId(id);
 			
 			// la session utilise deja un autre joueur : on le botte
 			if(joueur) {
@@ -128,7 +129,7 @@ module.exports = function() {
 	};
 	
 	Joueurs.prototype.deconnexionJoueur = function(id) {
-		joueur = this.getJoueurId(id);
+		var joueur = this.getJoueurId(id);
 		
 		if(joueur) {
 			joueur.deconnecte();
@@ -308,15 +309,28 @@ module.exports = function() {
 		};
 	};
 	
+	Manche.prototype.genObjUISocket = function(socket) {
+		// Le joueur correspondant à la demande
+		var joueur = this.joueurActif.joueurs.getJoueurId(socket);
+		
+		if(joueur) {
+			return this.genObjUI(joueur);
+		}
+		
+		return null;
+	}
+	
 	Manche.prototype.genObjUI = function(joueur) {
 	
+		console.log(joueur.toString());
+		
 		// l'objet de retour
 		var obj = {};
 		
 		// Trouver ordre des autres joueurs
-		joueurG = joueur.suivant();
-		joueurH = joueur.suivant().suivant();
-		joueurD = joueur.suivant().suivant().suivant();
+		var joueurG = joueur.suivant();
+		var joueurH = joueur.suivant().suivant();
+		var joueurD = joueur.suivant().suivant().suivant();
 		
 		// Joueurs cachés
 		obj.joueurG = joueurG.genDosUI();

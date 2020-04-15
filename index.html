@@ -156,9 +156,27 @@ button:hover {
 	  //$('#nom').val('');
 	  return false;
 	});
-	socket.on('joueur', function(joueur){
+	/*socket.on('joueur', function(joueur){
 	  $('#modalConnexion').modal('hide');
 	  $('#divConnexion').get()[0].innerHTML = "Bienvenue, " + joueur.nom + ".";
+	});*/
+	
+	/* On reçoit un update de l'UI sous la forme suivante :
+	
+	{joueurG: {…}, joueurH: {…}, joueurD: {…}, joueurB: {…}, Manche: {…}}
+		joueurG: {nom: "Simon", cartes: null, nbCartes: 10}
+		joueurH: {nom: "Marie-Helene", cartes: null, nbCartes: 11}
+		joueurD: {nom: "Marc", cartes: null, nbCartes: 11}
+		joueurB: {nom: "Micheline", cartes: Array(10)}
+		Manche: {atout: null, leveesEquipeA: 1}
+	
+	*/
+	socket.on('objUI', function(objUI){
+	  $('#modalConnexion').modal('hide');
+	  $('#divNomJoueurG').get()[0].innerHTML = objUI.joueurG.nom;
+	  $('#divNomJoueurH').get()[0].innerHTML = objUI.joueurH.nom;
+	  $('#divNomJoueurD').get()[0].innerHTML = objUI.joueurD.nom;
+	  $('#divNomJoueurB').get()[0].innerHTML = objUI.joueurB.nom;
 	});
   });
 </script>
@@ -177,7 +195,7 @@ button:hover {
         <div class="colonne">
         </div>
         <div class="centre">
-            <div class="nomJoueur">NomJoueurH</div>
+            <div class="nomJoueur" id="divNomJoueurH">NomJoueurH</div>
         	<div class="mainJoueur"><div class='hand vhand-compact' data-hand='flow: horizontal; spacing: 0.2; width: 90; cards: BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK'></div></div>
         </div>
         <div class="colonne">
@@ -185,7 +203,7 @@ button:hover {
 	</div>
     <div class="ligne milieu">
         <div class="colonne">
-            <div class="nomJoueur">NomJoueurG</div>
+            <div class="nomJoueur" id="divNomJoueurG">NomJoueurG</div>
         	<div class="mainJoueur" id="divMainJoueurG"><div class='hand vhand-compact' data-hand='flow: vertical; spacing: 0.2; width: 90; cards: BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK'></div></div>
         </div>
         <div class="centre">
@@ -198,7 +216,7 @@ button:hover {
             <div class="centreTable" id="divCarteB"><img class='card' src='cards/AS.svg'></div>
         </div>
         <div class="colonne">
-            <div class="nomJoueur">NomJoueurD</div>
+            <div class="nomJoueur" id="divNomJoueurD">NomJoueurD</div>
         	<div class="mainJoueur"><div class='hand vhand-compact' data-hand='flow: vertical; spacing: 0.2; width: 90; cards: BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK'></div></div>
         </div>
 	</div>
@@ -206,7 +224,7 @@ button:hover {
         <div class="colonne">
         </div>
         <div class="centre">
-            <div class="nomJoueur">NomJoueurB</div>
+            <div class="nomJoueur" id="divNomJoueurB">NomJoueurB</div>
         	<div class="mainJoueur">
 				<div class="hand fan">
 					<img class='card' src='cards/AS.svg'>
