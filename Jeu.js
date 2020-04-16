@@ -1,6 +1,7 @@
 module.exports = function() {
 	/*** CONSTANTES ***/
 	var PASSPHRASE = 'asdf';
+	var debug = false;
 	
 	/***************************/
 	/*** Joueur ***************/
@@ -36,7 +37,7 @@ module.exports = function() {
 	Joueur.prototype.genUI = function() {
 		return { 
 			nom: this.nom, 
-			cartes: this.main.cartes
+			main: this.main.toHTML()
 		};
 	}
 	
@@ -44,8 +45,7 @@ module.exports = function() {
 	Joueur.prototype.genDosUI = function() {
 		var obj = this.genUI();
 		
-		obj.nbCartes = obj.cartes.length;
-		obj.cartes = null;
+		obj.main = this.main.toHTMLDos();
 		
 		return obj;
 	}
@@ -169,6 +169,18 @@ module.exports = function() {
 		return false;
 	};
 	
+	Carte.prototype.toString = function() {
+		return false;
+	};
+	
+	Carte.prototype.toHTML = function() {
+		return "<img class='card' src='" + this.pathImage + "'>";
+	}
+	
+	Carte.prototype.toHTMLDos = function() {
+		return "<img class='card' src='cards/BLUE_BACK.svg'>";
+	}
+	
 	/**************************/
 	/*** Paquet ***************/
 	Paquet = function() {
@@ -238,6 +250,26 @@ module.exports = function() {
 		
 		return null;
 	};
+	
+	Main.prototype.toHTMLDos = function() {
+		var res = "";
+		
+		for(let i=0; i<this.cartes.length; ++i) {
+			res += this.cartes[i].toHTMLDos();
+		}
+		
+		return res;
+	}
+	
+	Main.prototype.toHTML = function() {
+		var res = "";
+		
+		for(let i=0; i<this.cartes.length; ++i) {
+			res += this.cartes[i].toHTML();
+		}
+		
+		return res;
+	}
 	
 	/**************************/
 	/*** Levee ***************/
@@ -332,10 +364,17 @@ module.exports = function() {
 		var joueurH = joueur.suivant().suivant();
 		var joueurD = joueur.suivant().suivant().suivant();
 		
-		// Joueurs cachés
-		obj.joueurG = joueurG.genDosUI();
-		obj.joueurH = joueurH.genDosUI();
-		obj.joueurD = joueurD.genDosUI();
+		if(debug === true) { 
+			// Joueurs cachés, mais montrés en debug
+			obj.joueurG = joueurG.genUI();
+			obj.joueurH = joueurH.genUI();
+			obj.joueurD = joueurD.genUI();
+		} else {
+			// Joueurs cachés
+			obj.joueurG = joueurG.genDosUI();
+			obj.joueurH = joueurH.genDosUI();
+			obj.joueurD = joueurD.genDosUI();
+		}
 		
 		// Joueur actif
 		obj.joueurB = joueur.genUI();

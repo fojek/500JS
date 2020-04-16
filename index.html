@@ -177,6 +177,19 @@ button:hover {
 	  $('#divNomJoueurH').get()[0].innerHTML = objUI.joueurH.nom;
 	  $('#divNomJoueurD').get()[0].innerHTML = objUI.joueurD.nom;
 	  $('#divNomJoueurB').get()[0].innerHTML = objUI.joueurB.nom;
+	  
+	  $('#divMainJoueurG').get()[0].innerHTML = objUI.joueurG.main;
+	  $('#divMainJoueurH').get()[0].innerHTML = objUI.joueurH.main;
+	  $('#divMainJoueurD').get()[0].innerHTML = objUI.joueurD.main;
+	  $('#divMainJoueurB').get()[0].innerHTML = objUI.joueurB.main;
+	  
+	  // debug
+	  window.objUI = objUI;
+	  
+	  // refresh
+	  $(".fan:not([data-bind])").each(function () {
+            window.cards.fan($(this));
+        });
 	});
   });
 </script>
@@ -195,8 +208,19 @@ button:hover {
         <div class="colonne">
         </div>
         <div class="centre">
-            <div class="nomJoueur" id="divNomJoueurH">NomJoueurH</div>
-        	<div class="mainJoueur"><div class='hand vhand-compact' data-hand='flow: horizontal; spacing: 0.2; width: 90; cards: BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK'></div></div>
+            <div class="nomJoueur"  id="divNomJoueurH">NomJoueurH</div>
+				<div class="mainJoueur">
+					<div class='hand vhand-compact' id="divMainJoueurH" data-hand='flow: horizontal; spacing: 0.2; width: 90'>
+						<img class='card' src='cards/BLUE_BACK.svg'>
+						<img class='card' src='cards/BLUE_BACK.svg'>
+						<img class='card' src='cards/BLUE_BACK.svg'>
+						<img class='card' src='cards/BLUE_BACK.svg'>
+						<img class='card' src='cards/BLUE_BACK.svg'>					
+						<img class='card' src='cards/BLUE_BACK.svg'>
+						<img class='card' src='cards/BLUE_BACK.svg'>
+						<img class='card' src='cards/BLUE_BACK.svg'>
+				</div>
+			</div>
         </div>
         <div class="colonne">
         </div>
@@ -204,7 +228,18 @@ button:hover {
     <div class="ligne milieu">
         <div class="colonne">
             <div class="nomJoueur" id="divNomJoueurG">NomJoueurG</div>
-        	<div class="mainJoueur" id="divMainJoueurG"><div class='hand vhand-compact' data-hand='flow: vertical; spacing: 0.2; width: 90; cards: BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK'></div></div>
+        	<div class="mainJoueur">
+				<div class='hand vhand-compact' id="divMainJoueurG" data-hand='flow: vertical; spacing: 0.2; width: 90'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>					
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+				</div>
+			</div>
         </div>
         <div class="centre">
         	<div class="centreTable" id="divCarteH"><img class='card' src='cards/AS.svg'></div>
@@ -217,7 +252,18 @@ button:hover {
         </div>
         <div class="colonne">
             <div class="nomJoueur" id="divNomJoueurD">NomJoueurD</div>
-        	<div class="mainJoueur"><div class='hand vhand-compact' data-hand='flow: vertical; spacing: 0.2; width: 90; cards: BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK,BLUE_BACK'></div></div>
+        	<div class="mainJoueur">
+				<div class='hand vhand-compact' id="divMainJoueurD" data-hand='flow: vertical; spacing: 0.2; width: 90'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>					
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK.svg'>
+				</div>
+			</div>
         </div>
 	</div>
     <div class="ligne hautOuBas">
@@ -226,20 +272,18 @@ button:hover {
         <div class="centre">
             <div class="nomJoueur" id="divNomJoueurB">NomJoueurB</div>
         	<div class="mainJoueur">
-				<div class="hand fan">
-					<img class='card' src='cards/AS.svg'>
-					<img class='card' src='cards/KS.svg'>
-					<img class='card' src='cards/QS.svg'>
-					<img class='card' src='cards/JS.svg'>
-					<img class='card' src='cards/10S.svg'>
-					<img class='card' src='cards/9S.svg'>
+				<div class='hand fan' id="divMainJoueurB">
+					<img class='card' src='cards/7S.svg'>
+					<img class='card' src='cards/8S.svg'>
+					<img class='card' src='cards/2S.svg'>
+					<img class='card' src='cards/2C.svg'>
 					<img class='card' src='cards/3H.svg'>
-					<img class='card' src='cards/10D.svg'>
 					<img class='card' src='cards/4D.svg'>
-					<img class='card' src='cards/2D.svg'>
-					<img class='card' src='cards/8C.svg'>
+					<img class='card' src='cards/10D.svg'>
+					<img class='card' src='cards/8H.svg'>
+					<img class='card' src='cards/5H.svg'>
 					<img class='card' src='cards/7C.svg'>
-					<img class='card' src='cards/Joker.svg'>
+					<img class='card' src='cards/8C.svg'>
 				</div>
 			</div>
         </div>
