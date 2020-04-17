@@ -126,6 +126,7 @@ button:hover {
 </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="cards.js"></script>
+    <script src="cards-ko.js" type="text/javascript"></script>
 	<script src="/socket.io/socket.io.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
@@ -139,8 +140,13 @@ button:hover {
   
 
   $(function () {
+  
+	cards.playCard = function ($card) {
+		alert(cards.cid($card) + ' was selected.');
+	};
+	
 	$('#modalConnexion').on('shown', function () {
-     $("#modalConnexion input").first().focus();
+		$("#modalConnexion input").first().focus();
     });
 	
     $('#modalConnexion').modal();
@@ -242,13 +248,13 @@ button:hover {
 			</div>
         </div>
         <div class="centre">
-        	<div class="centreTable" id="divCarteH"><img class='card' src='cards/AS.svg'></div>
+        	<div class="centreTable" id="divCarteH"><img class='card' src='cards/BLUE_BACK.svg'></div>
             <div class="centreTable">
-            	<div id="divCarteG"><img class='card' src='cards/AS.svg'></div>
+            	<div id="divCarteG"><img class='card' src='cards/BLUE_BACK.svg'></div>
                 <div>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</div>
-                <div id="divCarteD"><img class='card' src='cards/AS.svg'></div>
+                <div id="divCarteD"><img class='card' src='cards/BLUE_BACK.svg'></div>
             </div>
-            <div class="centreTable" id="divCarteB"><img class='card' src='cards/AS.svg'></div>
+            <div class="centreTable" id="divCarteB"><img class='card' src='cards/BLUE_BACK.svg'></div>
         </div>
         <div class="colonne">
             <div class="nomJoueur" id="divNomJoueurD">NomJoueurD</div>

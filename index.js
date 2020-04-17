@@ -10,7 +10,7 @@ require('./Jeu.js')();
 var partie = new Partie(new Joueurs());
 
 // Initie le jeu
-partie.Jouer();
+partie.jouer();
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -28,10 +28,10 @@ io.on('connection', function(socket){
   socket.on('connexion', function(msg){
 	// Effectue la connexion et renvoie le joeur (ou null si la connexion a échoué)
 	partie.joueurs.connexionJoueur(socket.id, msg.nom, msg.pp);
-	console.log("CHU RENDU ICITTE AUSSI");
 	/*io.emit('joueur', partie.joueurs.getJoueurId(socket.id));*/
-	console.log("CHU RENDU ICITTE ENCORE");
-	io.emit('objUI', partie.manches[partie.manches.length-1].genObjUISocket(socket.id));
+	io.to(socket.id).emit('objUI', partie.manches[partie.manches.length-1].genObjUISocket(socket.id));
+	//io.emit('objUI', partie.manches[partie.manches.length-1].genObjUISocket(socket.id));
+	console.log("UI envoye pour " + partie.joueurs.getJoueurId(socket.id));
   });
   socket.on('disconnect', function(){
     console.log('user disconnected');

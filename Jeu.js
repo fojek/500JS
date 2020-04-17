@@ -1,7 +1,7 @@
 module.exports = function() {
 	/*** CONSTANTES ***/
 	var PASSPHRASE = 'asdf';
-	var debug = false;
+	var debug = true;
 	
 	/***************************/
 	/*** Joueur ***************/
@@ -92,7 +92,6 @@ module.exports = function() {
 	};
 	
 	Joueurs.prototype.getJoueurId = function(id) {
-		console.log("dans getJoueurId");
 		for(let i=0; i < this.liste.length; ++i) {
 			if(this.liste[i].id == id) {
 				return this.liste[i];
@@ -165,8 +164,8 @@ module.exports = function() {
 		}
 	};
 	
-	Carte.prototype.Equals = function(carte) {
-		return false;
+	Carte.prototype.equals = function(c) {
+		return (this.no === c.no && this.enseigne === c.enseigne);
 	};
 	
 	Carte.prototype.toString = function() {
@@ -186,11 +185,11 @@ module.exports = function() {
 	Paquet = function() {
 		this.cartes = [];
 		
-		this.GenererPaquet();
-		this.Brasser();
+		this.genererPaquet();
+		this.brasser();
 	};
 	
-	Paquet.prototype.GenererPaquet = function() {
+	Paquet.prototype.genererPaquet = function() {
 		let enseignes  = ["S", "H", "D", "C"];
 		let noCartes = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 		
@@ -203,7 +202,7 @@ module.exports = function() {
 		this.cartes.push(new Carte("Joker"));
 	};
 	
-	Paquet.prototype.Brasser = function() {
+	Paquet.prototype.brasser = function() {
 		
 		func = function(a, b) {  
 			return 0.5 - Math.random();
@@ -212,8 +211,26 @@ module.exports = function() {
 		this.cartes = this.cartes.sort(func);
 	};
 	
+	Paquet.prototype.classer = function(atout) {
+
+		func = function(a, b) {  
+			return atout.val(b)-atout.val(a);
+		};
+
+		this.cartes = this.cartes.sort(func);
+	};
+
+	Paquet.prototype.toString = function() {
+		var res = "";
+		for(let i=0; i<this.cartes.length; ++i){
+			res += this.cartes[i].toString() + ",";
+		}
+		
+		return res;
+	};
+	
 	// Séparer le paquet en 5 mains
-	Paquet.prototype.Donner = function() {
+	Paquet.prototype.donner = function() {
 		let mains = [];
 		let mainEnCours = 0;
 		
@@ -251,6 +268,17 @@ module.exports = function() {
 		return null;
 	};
 	
+	Main.prototype.classer = function(atout) {
+
+		func = function(a, b) {  
+			return atout.val(b)-atout.val(a);
+		};
+
+		this.cartes = this.cartes.sort(func);
+		
+		return this;
+	};
+	
 	Main.prototype.toHTMLDos = function() {
 		var res = "";
 		
@@ -280,11 +308,11 @@ module.exports = function() {
 		this.atout = pAtout;
 	};
 	
-	Levee.prototype.NouvelleCarte = function(joueur, carte) {
+	Levee.prototype.nouvelleCarte = function(joueur, carte) {
 		this.cartes.push({ joueur: pJoueur, carte: pCarte });
 	};
 
-	Levee.prototype.VerifieGagnant = function() {
+	Levee.prototype.verifieGagnant = function() {
 		return this.atout.CompareCartes(this.getCartes());
 	};
 	
@@ -313,20 +341,67 @@ module.exports = function() {
 		this.enseigne = pEnseigne;
 		this.nbLevees = pNbLevees;
 		this.pts = pPts;
+		
+		// Pour les bars
+		this.oppos = "";
+		switch(this.enseigne) {
+			case "D":
+				this.oppos = "H";
+				break;        
+			case "H":
+				this.oppos = "D";
+				break;        
+			case "S":
+				this.oppos = "C";
+				break;        
+			case "C":
+				this.oppos = "S";
+				break;
+		}
 	};
 	
 	Atout.prototype.CompareCartes = function(cartes) {
 		return carte[0];
 	};
 	
+	// Retourne la valeur absolue de la carte, selon l'atout
+	Atout.prototype.val = function(c) {
+		var val = 0;
+		var enseignes  = ["D", "C", "H", "S"];
+		var noCartes = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+
+		if(this.enseigne !== "Sans") {
+			enseignes.splice(enseignes.lastIndexOf(this.enseigne),1)
+			enseignes.push(this.enseigne);
+		}
+
+		if(c.enseigne === "Joker") {
+			return 54;
+		} else if(c.no === "J" && c.enseigne === this.enseigne) {
+			return 53;
+		} else if(c.no === "J" && c.enseigne === this.oppos) {
+			return 52;
+		} else {
+			return enseignes.lastIndexOf(c.enseigne)*13 + noCartes.lastIndexOf(c.no);
+		}
+	};
+	
 	/**************************/
 	/*** Manche ***************/
-	Manche = function(pDonneur) {
-		this.atout = null;
+	Manche = function(pJoueurs, pDonneur) {
+		this.atout = new Atout("S", 10, 200);
 		this.levees = [];
 		this.mains = [];
 		this.donneur = pDonneur;
 		this.joueurActif = pDonneur;
+		this.joueurs = pJoueurs;
+		
+		var p = new Paquet();
+		var mains = p.donner();
+		
+		for(let i=0; i<this.joueurs.liste.length; ++i){
+			this.joueurs.liste[i].main = mains.pop().classer(this.atout);
+		}
 	};
 	
 	Manche.prototype.leveesEquipe = function(noEquipe) {
@@ -354,7 +429,7 @@ module.exports = function() {
 	
 	Manche.prototype.genObjUI = function(joueur) {
 	
-		console.log(joueur.toString());
+		console.log("Genere le UI pour " + joueur.toString());
 		
 		// l'objet de retour
 		var obj = {};
@@ -394,24 +469,17 @@ module.exports = function() {
 		this.donneur = this.joueurs.liste[0];
 	};
 	
-	Partie.prototype.CommencerManche = function() {
-		var p = new Paquet();
-		var mains = p.Donner();
-		
-		for(let i=0; i<this.joueurs.liste.length; ++i){
-			this.joueurs.liste[i].main = mains.pop();
-		}
-		
-		this.manches.push(new Manche(this.donneur));
+	Partie.prototype.commencerManche = function() {
+		this.manches.push(new Manche(this.joueurs, this.donneur));
 	};
 		
 	// Avance au donneur suivant avant de le retourner
-	Partie.prototype.Donneur = function() {
+	Partie.prototype.donneur = function() {
 		return this.donneur.suivant();
 	}
 	
-	Partie.prototype.Jouer = function() {
-		this.CommencerManche(0);
+	Partie.prototype.jouer = function() {
+		this.commencerManche(0);
 	}
 	
 	/**************************/
@@ -421,7 +489,7 @@ module.exports = function() {
 		var joueurs = new Joueurs();
 		var partie = new Partie(joueurs);
 		
-		partie.Jouer();
+		partie.jouer();
 		
 		return partie;
 	};
