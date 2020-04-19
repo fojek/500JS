@@ -25,9 +25,28 @@ module.exports = function() {
 		}
 	};
 	
+	Joueur.prototype.setMain = function(pMain) {
+		this.main = pMain;
+		this.main.setJoueur(this);
+	}
+	
 	Joueur.prototype.deconnecte = function() {
 		this.id = null;
 		console.log('(Sortie) ' + this.toString());
+	};
+	
+	Joueur.prototype.estActif = function() {
+		return this.main.estActive(this);
+	}
+	
+	Joueur.prototype.jouerCarte = function(path) {
+		if(this.estActif()) {
+			var carte = this.main.getCartePath(path);
+			
+			if(carte) {
+				this.main.jouerCarte(carte);
+			}
+		}
 	};
 	
 	Joueur.prototype.toString = function() {
@@ -182,11 +201,12 @@ module.exports = function() {
 	
 	/**************************/
 	/*** Paquet ***************/
-	Paquet = function() {
+	Paquet = function(pManche) {
 		this.cartes = [];
 		
 		this.genererPaquet();
 		this.brasser();
+		this.manche = pManche;
 	};
 	
 	Paquet.prototype.genererPaquet = function() {
@@ -235,7 +255,7 @@ module.exports = function() {
 		let mainEnCours = 0;
 		
 		for(let i=0; i<5; ++i){
-			mains.push(new Main());
+			mains.push(new Main(this.manche));
 		}
 		
 		// Donne une carte à chaque joueur dans l'ordre, avec un paquet supp
@@ -251,21 +271,38 @@ module.exports = function() {
 	
 	/**************************/
 	/*** Main ***************/
-	Main = function() {
+	Main = function(pManche) {
 		this.cartes = [];
+		this.manche = pManche;
+		this.joueur = null;
 	};
+	
+	Main.prototype.setJoueur = function(pJoueur) {
+		this.joueur = pJoueur;
+	}
 	
 	Main.prototype.ajouterCarte = function(carte) {
 		this.cartes.push(carte);
 	};
 	
-	Main.prototype.jouerCarte = function(carte) {
+	Main.prototype.retirerCarte = function(carte) {
 		for(let i=0; i<this.cartes.length; ++i){
 			if(this.cartes[i].equals(carte))
 				return this.cartes.splice(i,1);
 		}
 		
 		return null;
+	};
+	
+	Main.prototype.estActive = function() {
+		console.log("Le joueur actif est : " + this.manche.joueurActif);
+		return this.joueur == this.manche.joueurActif;
+	}
+	
+	Main.prototype.jouerCarte = function(carte) {
+		this.manche.leveeEnCours().nouvelleCarte(carte);
+		
+		return this.retirerCarte(carte);
 	};
 	
 	Main.prototype.classer = function(atout) {
@@ -277,6 +314,15 @@ module.exports = function() {
 		this.cartes = this.cartes.sort(func);
 		
 		return this;
+	};
+	
+	Main.prototype.getCartePath = function(path) {
+		for(let i=0; i < this.cartes.length; ++i) {
+			if(this.cartes[i].pathImage == path)
+				return this.cartes[i];
+		}
+		// Cette carte n'est pas dans la main du joueur.
+		return null;
 	};
 	
 	Main.prototype.toHTMLDos = function() {
@@ -301,19 +347,32 @@ module.exports = function() {
 	
 	/**************************/
 	/*** Levee ***************/
-	Levee = function(pAtout) {
+	Levee = function(pAtout, pDonneur, pManche) {
 		this.cartes = [];
-		this.nbLevees = pNbLevees;
-		this.pts = pPts;
 		this.atout = pAtout;
+		this.joueurActif = pDonneur;
+		this.manche = pManche;
 	};
 	
-	Levee.prototype.nouvelleCarte = function(joueur, carte) {
+	// Ajoute une carte a une levée. Retourne vrai si la levée est complète.
+	Levee.prototype.nouvelleCarte = function(pJoueur, pCarte) {
 		this.cartes.push({ joueur: pJoueur, carte: pCarte });
+		
+		return this.verifStatut();
 	};
+	
+	Levee.prototype.verifStatut = function() {
+		if(this.cartes.length==4) {
+			this.manche.LeveeTerminee();
+			return true;
+		} else {
+			this.manche.joueurSuivant();
+			return false;
+		}
+	}
 
 	Levee.prototype.verifieGagnant = function() {
-		return this.atout.CompareCartes(this.getCartes());
+		return this.getJoueurCarte(this.classer()[0]);
 	};
 	
 	Levee.prototype.getCartes = function() {
@@ -322,6 +381,30 @@ module.exports = function() {
 		for(let i=0; i<this.cartes.length; ++i){
 			cartes.push(this.cartes[i].carte);
 		}
+		
+		return cartes;
+	};
+
+	Levee.prototype.getJoueurCarte = function(carte) {
+
+		for(let i=0; i<this.cartes.length; ++i){
+			if(this.cartes[i].carte.equals(carte))
+				return this.cartes[i].joueur;
+		}
+		
+		// Pas de joueur associé à cette carte?
+		return null;
+	};
+	
+	Levee.prototype.classer = function(atout) {
+		
+		var cartes = this.getCartes();
+		
+		func = function(a, b) {  
+			return atout.val(b)-atout.val(a);
+		};
+
+		cartes.sort(func);
 		
 		return cartes;
 	};
@@ -389,19 +472,58 @@ module.exports = function() {
 	/**************************/
 	/*** Manche ***************/
 	Manche = function(pJoueurs, pDonneur) {
-		this.atout = new Atout("S", 10, 200);
+		this.atout = null;
 		this.levees = [];
 		this.mains = [];
 		this.donneur = pDonneur;
 		this.joueurActif = pDonneur;
 		this.joueurs = pJoueurs;
 		
-		var p = new Paquet();
-		var mains = p.donner();
+		this.init();
+	};
+	
+	Manche.prototype.init = function() {
+		this.ChoisirAtout();
 		
-		for(let i=0; i<this.joueurs.liste.length; ++i){
-			this.joueurs.liste[i].main = mains.pop().classer(this.atout);
+		do {
+			var p = new Paquet(this);
+			var mains = p.donner();
+			
+			for(let i=0; i<this.joueurs.liste.length; ++i){
+				this.joueurs.liste[i].setMain(mains.pop().classer(this.atout));
+			}
+			
+			this.ChoisirAtout();
+		} while(this.atout == null);
+		
+		this.Jouer();
+	};
+	
+	Manche.prototype.ChoisirAtout = function() {
+		this.atout = new Atout("S", 10, 200);
+	}
+	
+	Manche.prototype.Jouer = function() {
+		if(this.levees.length < 10) {
+			this.levees.push(new Levee(this.atout, this.donneur, this));
 		}
+	};
+	
+	Manche.prototype.joueurSuivant = function() {
+		this.joueurActif = this.joueurActif.suivant();
+	};	
+	
+	Manche.prototype.LeveeTerminee = function() {
+		this.joueurActif = this.leveeEnCours().verifieGagnant();
+		this.Jouer();
+	};
+	
+	Manche.prototype.setJoueurActif = function(joueur) {
+		this.joueurActif = joueur;
+	};
+	
+	Manche.prototype.leveeEnCours = function() {
+		return this.levees[this.levees.length-1];
 	};
 	
 	Manche.prototype.leveesEquipe = function(noEquipe) {
@@ -416,6 +538,14 @@ module.exports = function() {
 		};
 	};
 	
+	Manche.prototype.updateUI = function(io) {
+		for(let i=0; i<this.joueurs.liste.length; ++i) {
+		if(this.joueurs.liste[i].id !== null) {
+				io.to(this.joueurs.liste[i].id).emit('objUI', this.genObjUISocket(this.joueurs.liste[i].id));
+			}
+		}
+	};
+	
 	Manche.prototype.genObjUISocket = function(socket) {
 		// Le joueur correspondant à la demande
 		var joueur = this.joueurActif.joueurs.getJoueurId(socket);
@@ -425,7 +555,7 @@ module.exports = function() {
 		}
 		
 		return null;
-	}
+	};
 	
 	Manche.prototype.genObjUI = function(joueur) {
 	

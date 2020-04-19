@@ -20,7 +20,6 @@ app.get('/index.html', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
-
 app.use(express.static('cardsJS'));
 
 io.on('connection', function(socket){
@@ -36,6 +35,13 @@ io.on('connection', function(socket){
   socket.on('disconnect', function(){
     console.log('user disconnected');
 	partie.joueurs.deconnexionJoueur(socket.id);
+  });
+  socket.on('demandeJoueCarte', function(carte){
+    console.log(partie.joueurs.getJoueurId(socket.id) + " veut jouer la carte : " + carte);
+	partie.joueurs.getJoueurId(socket.id).jouerCarte(carte);
+	
+	// Refraîchit pour tous les joueurs connectés
+	partie.manches[partie.manches.length-1].updateUI(io);
   });
 });
 

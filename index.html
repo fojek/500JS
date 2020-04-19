@@ -140,9 +140,10 @@ button:hover {
   
 
   $(function () {
-  
+  	var socket = io();
+	
 	cards.playCard = function ($card) {
-		alert(cards.cid($card) + ' was selected.');
+		socket.emit('demandeJoueCarte', $card.attr('src'));
 	};
 	
 	$('#modalConnexion').on('shown', function () {
@@ -151,7 +152,6 @@ button:hover {
 	
     $('#modalConnexion').modal();
 	
-	var socket = io();
 	$('form').submit(function(e){
 	  e.preventDefault(); // prevents page reloading
 		
@@ -159,7 +159,7 @@ button:hover {
 			nom: $('#nom').val(), 
 			pp: $('#passphrase').val()
 		  });
-	  //$('#nom').val('');
+		  
 	  return false;
 	});
 	/*socket.on('joueur', function(joueur){
@@ -278,7 +278,7 @@ button:hover {
         <div class="centre">
             <div class="nomJoueur" id="divNomJoueurB">NomJoueurB</div>
         	<div class="mainJoueur">
-				<div class='hand fan' id="divMainJoueurB">
+				<div class='hand fan active-hand' id="divMainJoueurB">
 					<img class='card' src='cards/7S.svg'>
 					<img class='card' src='cards/8S.svg'>
 					<img class='card' src='cards/2S.svg'>
