@@ -54,24 +54,40 @@ module.exports = function() {
 	}
 	
 	Joueur.prototype.genUI = function() {
-		return { 
-			nom: this.nom, 
-			main: this.main.toHTML()
-		};
+		if(debug === true) { 
+			return { 
+				nom: this.nom, 
+				main: this.main.toHTML()
+			};
+		} else {
+			return { 
+				nom: this.nom, 
+				main: this.main.toHTMLDos()
+			};
+		}
 	}
 	
 	// obj pour les autres joueurs
 	Joueur.prototype.genDosUI = function() {
-		var obj = this.genUI();
-		
-		obj.main = this.main.toHTMLDos();
-		
-		return obj;
+
 	}
 	
 	Joueur.prototype.suivant = function() {
 		return this.joueurs.joueurSuivant(this);
 	}
+	
+	Joueur.prototype.getJoueurPos = function(pos) {
+		switch(pos) {
+			case 'G':
+				return this.suivant();
+			case 'H':
+				return this.suivant().suivant();
+			case 'D':
+				return this.suivant().suivant().suivant();
+			case 'B':
+				return this;
+		}
+	};
 
 	/***************************/
 	/*** Joueurs ***************/
@@ -176,10 +192,14 @@ module.exports = function() {
 			this.pathImage = "cards/" + pNumero + pEnseigne + ".svg";
 			this.no = pNumero;
 			this.enseigne = pEnseigne;
-		} else {
+		} else if (pNumero == 'Joker') {
 			this.pathImage = "cards/Joker.svg";
 			this.no = "Joker";
 			this.enseigne = "Joker";
+		} else {
+			this.pathImage = "cards/BLUE_BACK.svg";
+			this.no = "Vide";
+			this.enseigne = "Vide";
 		}
 	};
 	
@@ -188,7 +208,7 @@ module.exports = function() {
 	};
 	
 	Carte.prototype.toString = function() {
-		return false;
+		return this.no + " de " + this.enseigne;
 	};
 	
 	Carte.prototype.toHTML = function() {
@@ -300,7 +320,7 @@ module.exports = function() {
 	}
 	
 	Main.prototype.jouerCarte = function(carte) {
-		this.manche.leveeEnCours().nouvelleCarte(carte);
+		this.manche.leveeEnCours().nouvelleCarte(this.joueur, carte);
 		
 		return this.retirerCarte(carte);
 	};
@@ -358,6 +378,8 @@ module.exports = function() {
 	Levee.prototype.nouvelleCarte = function(pJoueur, pCarte) {
 		this.cartes.push({ joueur: pJoueur, carte: pCarte });
 		
+		console.log(this.cartes);
+		
 		return this.verifStatut();
 	};
 	
@@ -386,7 +408,6 @@ module.exports = function() {
 	};
 
 	Levee.prototype.getJoueurCarte = function(carte) {
-
 		for(let i=0; i<this.cartes.length; ++i){
 			if(this.cartes[i].carte.equals(carte))
 				return this.cartes[i].joueur;
@@ -396,9 +417,20 @@ module.exports = function() {
 		return null;
 	};
 	
-	Levee.prototype.classer = function(atout) {
+	Levee.prototype.getCarteJoueur = function(joueur) {
+		for(let i=0; i<this.cartes.length; ++i){
+			if(this.cartes[i].joueur.nom == joueur.nom)
+				return this.cartes[i].carte;
+		}
+		
+		// Pas de carte associée à ce joueur?
+		return new Carte("Vide");
+	};
+	
+	Levee.prototype.classer = function() {
 		
 		var cartes = this.getCartes();
+		var atout = this.atout;
 		
 		func = function(a, b) {  
 			return atout.val(b)-atout.val(a);
@@ -408,14 +440,47 @@ module.exports = function() {
 		
 		return cartes;
 	};
-	
+	/*
 	Levee.prototype.getJoueur = function(carte) {
 		for(let i=0; i<this.cartes.length; ++i){
-			if(this.cartes[i].equals(carte))
+			if(this.cartes[i].carte.equals(carte))
 				return this.cartes[i].joueur;
 		}
 		
 		return null;
+	};*/
+	
+	Levee.prototype.toString = function() {
+		var res = "La levee a " + this.cartes.length + " cartes:\n";
+		for(let i=0; i<this.cartes.length; ++i){
+			res += "\t" + this.cartes[i].carte + " : " + this.cartes[i].joueur;
+		}
+		return res;
+	};
+	
+	// Genere le UI pour les cartes du centre selon la position du joueur
+	Levee.prototype.genUI = function(joueur) {
+		var obj = {
+			carteH: null,
+			carteB: null,
+			carteD: null,
+			carteG: null
+		};
+		
+		obj.carteH = this.getCarteJoueur(joueur.getJoueurPos('H')).toHTML();
+		obj.carteB = this.getCarteJoueur(joueur.getJoueurPos('B')).toHTML();
+		obj.carteD = this.getCarteJoueur(joueur.getJoueurPos('D')).toHTML();
+		obj.carteG = this.getCarteJoueur(joueur.getJoueurPos('G')).toHTML();
+		
+		return obj;
+	}
+	
+	Levee.prototype.toStringCartes = function(cartes) {
+		var res = "La levee a " + cartes.length + " cartes:\n";
+		for(let i=0; i<cartes.length; ++i){
+			res += "\t" + i + ": " + cartes[i].toString() + "\n";
+		}
+		return res;
 	};
 	
 	/**************************/
@@ -515,6 +580,7 @@ module.exports = function() {
 	
 	Manche.prototype.LeveeTerminee = function() {
 		this.joueurActif = this.leveeEnCours().verifieGagnant();
+		console.log("Levee gagnee par: " + this.joueurActif);
 		this.Jouer();
 	};
 	
@@ -563,29 +629,20 @@ module.exports = function() {
 		
 		// l'objet de retour
 		var obj = {};
-		
-		// Trouver ordre des autres joueurs
-		var joueurG = joueur.suivant();
-		var joueurH = joueur.suivant().suivant();
-		var joueurD = joueur.suivant().suivant().suivant();
-		
-		if(debug === true) { 
-			// Joueurs cachés, mais montrés en debug
-			obj.joueurG = joueurG.genUI();
-			obj.joueurH = joueurH.genUI();
-			obj.joueurD = joueurD.genUI();
-		} else {
-			// Joueurs cachés
-			obj.joueurG = joueurG.genDosUI();
-			obj.joueurH = joueurH.genDosUI();
-			obj.joueurD = joueurD.genDosUI();
-		}
+
+		// Joueurs cachés, selon leur position
+		obj.joueurG = joueur.getJoueurPos('G').genUI();
+		obj.joueurH = joueur.getJoueurPos('H').genUI();
+		obj.joueurD = joueur.getJoueurPos('D').genUI();
 		
 		// Joueur actif
 		obj.joueurB = joueur.genUI();
 		
 		// Manche
-		obj.Manche = this.genUI();
+		obj.manche = this.genUI();
+		
+		// Levee
+		obj.levee = this.leveeEnCours().genUI(joueur);
 		
 		return obj;
 	};
