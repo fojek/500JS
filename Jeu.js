@@ -49,6 +49,13 @@ module.exports = function() {
 		}
 	};
 	
+	// Couleur gris pale quand le joueur est actif
+	Joueur.prototype.background = function() {
+		if(this.estActif())
+			return 'lightgray';
+		return '';
+	}
+	
 	Joueur.prototype.toString = function() {
 		return this.nom + ' : ' + this.id;
 	}
@@ -57,19 +64,16 @@ module.exports = function() {
 		if(debug === true) { 
 			return { 
 				nom: this.nom, 
-				main: this.main.toHTML()
+				main: this.main.toHTML(),
+				background: this.background()
 			};
 		} else {
 			return { 
 				nom: this.nom, 
-				main: this.main.toHTMLDos()
+				main: this.main.toHTMLDos(),
+				background: this.background()
 			};
 		}
-	}
-	
-	// obj pour les autres joueurs
-	Joueur.prototype.genDosUI = function() {
-
 	}
 	
 	Joueur.prototype.suivant = function() {
@@ -197,9 +201,19 @@ module.exports = function() {
 			this.no = "Joker";
 			this.enseigne = "Joker";
 		} else {
-			this.pathImage = "cards/BLUE_BACK.svg";
+			this.pathImage = "cards/Vide.svg";
 			this.no = "Vide";
 			this.enseigne = "Vide";
+		}
+	};
+	
+	Carte.prototype.getEnseigne = function(atout) {
+		if(this.enseigne === "Joker") {
+			return atout.enseigne;
+		} else if(this.no === "J" && atout.enseigne === this.oppos) {
+			return atout.enseigne;
+		} else {
+			return this.enseigne;
 		}
 	};
 	
@@ -216,7 +230,7 @@ module.exports = function() {
 	}
 	
 	Carte.prototype.toHTMLDos = function() {
-		return "<img class='card' src='cards/BLUE_BACK.svg'>";
+		return "<img class='card' src='cards/BLUE_BACK_500.svg'>";
 	}
 	
 	/**************************/
@@ -319,10 +333,36 @@ module.exports = function() {
 		return this.joueur == this.manche.joueurActif;
 	}
 	
-	Main.prototype.jouerCarte = function(carte) {
-		this.manche.leveeEnCours().nouvelleCarte(this.joueur, carte);
+	Main.prototype.contientEnseigne = function(enseigne) {
+		for(let i=0; i<this.cartes.length; ++i){
+			if(this.cartes[i].getEnseigne(this.manche.atout) == enseigne)
+				return true;
+		}
 		
-		return this.retirerCarte(carte);
+		return false;
+	};
+	
+	Main.prototype.verifCarteValide = function(carte) {
+		if(this.manche.leveeEnCours().atoutLevee()) {
+			// Si la carte qu'on veut jouer est du bon atout, ok
+			if(this.manche.leveeEnCours().atoutLevee() == carte.getEnseigne(this.manche.atout)) {
+				return true;
+			} else {
+				// Ok si la main n'a pas de l'atout cherché
+				return !this.contientEnseigne(this.manche.leveeEnCours().atoutLevee());
+			}
+		// Première carte, on peut jouer
+		} else {
+			return true;
+		}
+	};
+	
+	Main.prototype.jouerCarte = function(carte) {
+		if(this.verifCarteValide(carte)) {
+			this.manche.leveeEnCours().nouvelleCarte(this.joueur, carte);
+			return this.retirerCarte(carte);
+		}
+		return null;
 	};
 	
 	Main.prototype.classer = function(atout) {
@@ -383,8 +423,30 @@ module.exports = function() {
 		return this.verifStatut();
 	};
 	
+	Levee.prototype.atoutLevee = function() {
+		if(this.cartes[0])
+			return this.cartes[0].carte.getEnseigne(this.atout);
+		
+		return null;
+	};
+	
+	Levee.prototype.atoutPresent = function() {
+		
+		for(let i=0; i<this.cartes.length; ++i){
+			if(this.cartes[i].carte.getEnseigne(this.atout) == this.atout)
+				return true;
+		}
+		
+		// Pas d'atout joué
+		return false;
+	};
+	
+	Levee.prototype.estComplete = function() {
+		return (this.cartes.length == 4);
+	};
+	
 	Levee.prototype.verifStatut = function() {
-		if(this.cartes.length==4) {
+		if(this.estComplete()) {
 			this.manche.LeveeTerminee();
 			return true;
 		} else {
@@ -568,9 +630,15 @@ module.exports = function() {
 		this.atout = new Atout("S", 10, 200);
 	}
 	
+	Manche.prototype.nouvelleLevee = function() {
+		this.levees.push(new Levee(this.atout, this.donneur, this));
+	}
+	
 	Manche.prototype.Jouer = function() {
-		if(this.levees.length < 10) {
-			this.levees.push(new Levee(this.atout, this.donneur, this));
+		if(this.leveeEnCours().estComplete()) {
+			if(this.levees.length < 10) {
+				this.nouvelleLevee();
+			}
 		}
 	};
 	
@@ -581,7 +649,6 @@ module.exports = function() {
 	Manche.prototype.LeveeTerminee = function() {
 		this.joueurActif = this.leveeEnCours().verifieGagnant();
 		console.log("Levee gagnee par: " + this.joueurActif);
-		this.Jouer();
 	};
 	
 	Manche.prototype.setJoueurActif = function(joueur) {
@@ -589,7 +656,12 @@ module.exports = function() {
 	};
 	
 	Manche.prototype.leveeEnCours = function() {
-		return this.levees[this.levees.length-1];
+		if(this.levees.length != 0) {
+			return this.levees[this.levees.length-1];
+		} else {
+			this.nouvelleLevee();
+			return this.leveeEnCours();
+		}
 	};
 	
 	Manche.prototype.leveesEquipe = function(noEquipe) {
@@ -654,6 +726,10 @@ module.exports = function() {
 		this.manches = [];
 		this.joueurs = joueurs;
 		this.donneur = this.joueurs.liste[0];
+	};
+	
+	Partie.prototype.mancheEnCours = function() {
+		return this.manches[this.manches.length-1];
 	};
 	
 	Partie.prototype.commencerManche = function() {

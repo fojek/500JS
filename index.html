@@ -150,6 +150,10 @@ button:hover {
 		$("#modalConnexion input").first().focus();
     });
 	
+	$('#divCentreTable').on('click', function () {
+		socket.emit('leveeSuivante', 'true');
+    });
+	
     $('#modalConnexion').modal();
 	
 	$('form').submit(function(e){
@@ -179,20 +183,30 @@ button:hover {
 	*/
 	socket.on('objUI', function(objUI){
 	  $('#modalConnexion').modal('hide');
-	  $('#divNomJoueurG').get()[0].innerHTML = objUI.joueurG.nom;
-	  $('#divNomJoueurH').get()[0].innerHTML = objUI.joueurH.nom;
-	  $('#divNomJoueurD').get()[0].innerHTML = objUI.joueurD.nom;
-	  $('#divNomJoueurB').get()[0].innerHTML = objUI.joueurB.nom;
 	  
-	  $('#divMainJoueurG').get()[0].innerHTML = objUI.joueurG.main;
-	  $('#divMainJoueurH').get()[0].innerHTML = objUI.joueurH.main;
-	  $('#divMainJoueurD').get()[0].innerHTML = objUI.joueurD.main;
-	  $('#divMainJoueurB').get()[0].innerHTML = objUI.joueurB.main;
+	  // Noms
+	  $('#divNomJoueurG').get(0).innerHTML = objUI.joueurG.nom;
+	  $('#divNomJoueurH').get(0).innerHTML = objUI.joueurH.nom;
+	  $('#divNomJoueurD').get(0).innerHTML = objUI.joueurD.nom;
+	  $('#divNomJoueurB').get(0).innerHTML = objUI.joueurB.nom;
 	  
-	  $('#divCarteG').get()[0].innerHTML = objUI.levee.carteG;
-	  $('#divCarteH').get()[0].innerHTML = objUI.levee.carteH;
-	  $('#divCarteD').get()[0].innerHTML = objUI.levee.carteD;
-	  $('#divCarteB').get()[0].innerHTML = objUI.levee.carteB;
+	  // Mains
+	  $('#divMainJoueurG').get(0).innerHTML = objUI.joueurG.main;
+	  $('#divMainJoueurH').get(0).innerHTML = objUI.joueurH.main;
+	  $('#divMainJoueurD').get(0).innerHTML = objUI.joueurD.main;
+	  $('#divMainJoueurB').get(0).innerHTML = objUI.joueurB.main;
+	  
+	  // Levee
+	  $('#divCarteG').get(0).innerHTML = objUI.levee.carteG;
+	  $('#divCarteH').get(0).innerHTML = objUI.levee.carteH;
+	  $('#divCarteD').get(0).innerHTML = objUI.levee.carteD;
+	  $('#divCarteB').get(0).innerHTML = objUI.levee.carteB;
+	  
+	  // Joueur actif
+	  $('#divNomJoueurG').get(0).parentNode.style.background = objUI.joueurG.background;
+	  $('#divNomJoueurH').get(0).parentNode.style.background = objUI.joueurH.background;
+	  $('#divNomJoueurD').get(0).parentNode.style.background = objUI.joueurD.background;
+	  $('#divNomJoueurB').get(0).parentNode.style.background = objUI.joueurB.background;
 	  
 	  // debug
 	  window.objUI = objUI;
@@ -210,7 +224,7 @@ button:hover {
 			<h3>Jeu de 500 en ligne!</h3>
         </div>       
 		<div class="colonne larg200 fondVert" id="divConnexion">
-			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalPrendre">
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalConnexion">
 			  Connexion
 			</button>
         </div>
@@ -219,17 +233,17 @@ button:hover {
         <div class="colonne">
         </div>
         <div class="centre">
-            <div class="nomJoueur"  id="divNomJoueurH">NomJoueurH</div>
-				<div class="mainJoueur">
-					<div class='hand vhand-compact' id="divMainJoueurH" data-hand='flow: horizontal; spacing: 0.2; width: 90'>
-						<img class='card' src='cards/BLUE_BACK.svg'>
-						<img class='card' src='cards/BLUE_BACK.svg'>
-						<img class='card' src='cards/BLUE_BACK.svg'>
-						<img class='card' src='cards/BLUE_BACK.svg'>
-						<img class='card' src='cards/BLUE_BACK.svg'>					
-						<img class='card' src='cards/BLUE_BACK.svg'>
-						<img class='card' src='cards/BLUE_BACK.svg'>
-						<img class='card' src='cards/BLUE_BACK.svg'>
+            <div class="nomJoueur" id="divNomJoueurH"></div>
+			<div class="mainJoueur">
+				<div class='hand vhand-compact' id="divMainJoueurH" data-hand='flow: horizontal; spacing: 0.2; width: 90'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>					
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
 				</div>
 			</div>
         </div>
@@ -238,41 +252,41 @@ button:hover {
 	</div>
     <div class="ligne milieu">
         <div class="colonne">
-            <div class="nomJoueur" id="divNomJoueurG">NomJoueurG</div>
+            <div class="nomJoueur" id="divNomJoueurG"></div>
         	<div class="mainJoueur">
 				<div class='hand vhand-compact' id="divMainJoueurG" data-hand='flow: vertical; spacing: 0.2; width: 90'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>					
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>					
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
 				</div>
 			</div>
         </div>
-        <div class="centre">
-        	<div class="centreTable" id="divCarteH"><img class='card' src='cards/BLUE_BACK.svg'></div>
+        <div class="centre" id="divCentreTable>
+        	<div class="centreTable" id="divCarteH"><img class='card' src='cards/Vide.svg'></div>
             <div class="centreTable">
-            	<div id="divCarteG"><img class='card' src='cards/BLUE_BACK.svg'></div>
+            	<div id="divCarteG"><img class='card' src='cards/Vide.svg'></div>
                 <div>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</div>
-                <div id="divCarteD"><img class='card' src='cards/BLUE_BACK.svg'></div>
+                <div id="divCarteD"><img class='card' src='cards/Vide.svg'></div>
             </div>
-            <div class="centreTable" id="divCarteB"><img class='card' src='cards/BLUE_BACK.svg'></div>
+            <div class="centreTable" id="divCarteB"><img class='card' src='cards/Vide.svg'></div>
         </div>
         <div class="colonne">
-            <div class="nomJoueur" id="divNomJoueurD">NomJoueurD</div>
+            <div class="nomJoueur" id="divNomJoueurD"></div>
         	<div class="mainJoueur">
 				<div class='hand vhand-compact' id="divMainJoueurD" data-hand='flow: vertical; spacing: 0.2; width: 90'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>					
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
-					<img class='card' src='cards/BLUE_BACK.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>					
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
 				</div>
 			</div>
         </div>
@@ -281,20 +295,20 @@ button:hover {
         <div class="colonne">
         </div>
         <div class="centre">
-            <div class="nomJoueur" id="divNomJoueurB">NomJoueurB</div>
+            <div class="nomJoueur" id="divNomJoueurB"></div>
         	<div class="mainJoueur">
 				<div class='hand fan active-hand' id="divMainJoueurB">
-					<img class='card' src='cards/7S.svg'>
-					<img class='card' src='cards/8S.svg'>
-					<img class='card' src='cards/2S.svg'>
-					<img class='card' src='cards/2C.svg'>
-					<img class='card' src='cards/3H.svg'>
-					<img class='card' src='cards/4D.svg'>
-					<img class='card' src='cards/10D.svg'>
-					<img class='card' src='cards/8H.svg'>
-					<img class='card' src='cards/5H.svg'>
-					<img class='card' src='cards/7C.svg'>
-					<img class='card' src='cards/8C.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
+					<img class='card' src='cards/BLUE_BACK_500.svg'>
 				</div>
 			</div>
         </div>
